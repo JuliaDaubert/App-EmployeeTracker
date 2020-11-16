@@ -1,33 +1,23 @@
-  
-//Dependencies found here
+
+//Dependencies
 const inquirer = require("inquirer");
 const mysql = require("mysql");
-//const cTable = require("console.table");
-//const db = require(".");
 
 const connection = mysql.createConnection({
   host: "localhost",
-
-  // Your port; if not 3306
   port: 3306,
-
-  // Your username
   user: "root",
-
-  // Your password
-  password: "Muckel1.1",
+  password: "",
   database: "company_db"
 });
 
-connection.connect(function(err) {
+connection.connect(function (err) {
   if (err) throw err;
   console.log("connected as id " + connection.threadId);
-
   startScreen();
-  //  connection.end();//
 });
 
-//What the user will first see once logged into node
+//StartScreen w choice options
 function startScreen() {
   inquirer
     .prompt({
@@ -45,7 +35,7 @@ function startScreen() {
       message: "What would you like to do?",
       name: "option"
     })
-    .then(function(result) {
+    .then(function (result) {
       console.log("You entered: " + result.option);
 
       switch (result.option) {
@@ -76,31 +66,22 @@ function startScreen() {
     });
 }
 
-
-//All of the corresponding functions found below
-
 function addDepartment() {
 
+  inquirer.prompt({
+    type: "input",
+    message: "What is the name of the department?",
+    name: "deptName"
+  }).then(function (answer) {
 
-    inquirer.prompt({
-      
-        type: "input",
-        message: "What is the name of the department?",
-        name: "deptName"
-
-    }).then(function(answer){
-
-
-
-        connection.query("INSERT INTO department (name) VALUES (?)", [answer.deptName] , function(err, res) {
-            if (err) throw err;
-            //Debug
-            console.table(res)
-            startScreen()
+    connection.query("INSERT INTO department (name) VALUES (?)", [answer.deptName], function (err, res) {
+      if (err) throw err;
+      //Debug
+      console.table(res)
+      startScreen()
     })
-    })
+  })
 }
-
 
 function addRole() {
   inquirer
@@ -121,10 +102,9 @@ function addRole() {
         name: "deptID"
       }
     ])
-    .then(function(answer) {
+    .then(function (answer) {
 
-
-      connection.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)", [answer.roleName, answer.salaryTotal, answer.deptID], function(err, res) {
+      connection.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)", [answer.roleName, answer.salaryTotal, answer.deptID], function (err, res) {
         if (err) throw err;
         console.table(res);
         startScreen();
@@ -156,18 +136,16 @@ function addEmployee() {
         name: "managerID"
       }
     ])
-    .then(function(answer) {
+    .then(function (answer) {
 
-      
-      connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answer.eeFirstName, answer.eeLastName, answer.roleID, answer.managerID], function(err, res) {
+
+      connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answer.eeFirstName, answer.eeLastName, answer.roleID, answer.managerID], function (err, res) {
         if (err) throw err;
         console.table(res);
         startScreen();
       });
     });
 }
-
-//Since we're using inquirer, we can pass the query into the method as an array
 
 function updateEmployee() {
   inquirer
@@ -184,12 +162,8 @@ function updateEmployee() {
         name: "updateRole"
       }
     ])
-    .then(function(answer) {
-      // let query = `INSERT INTO department (name) VALUES ("${answer.deptName}")`
-      //let query = `'UPDATE employee SET role_id=${answer.updateRole} WHERE first_name= ${answer.eeUpdate}`;
-      //console.log(query);
-
-      connection.query('UPDATE employee SET role_id=? WHERE first_name= ?',[answer.updateRole, answer.eeUpdate],function(err, res) {
+    .then(function (answer) {
+      connection.query('UPDATE employee SET role_id=? WHERE first_name= ?', [answer.updateRole, answer.eeUpdate], function (err, res) {
         if (err) throw err;
         console.table(res);
         startScreen();
@@ -198,36 +172,32 @@ function updateEmployee() {
 }
 
 function viewDepartment() {
-  // select from the db
   let query = "SELECT * FROM department";
-  connection.query(query, function(err, res) {
-   if (err) throw err;
+  connection.query(query, function (err, res) {
+    if (err) throw err;
     console.table(res);
     startScreen();
   });
-  // show the result to the user (console.table)
+  
 }
 
 function viewRoles() {
-  // select from the db
   let query = "SELECT * FROM role";
-  connection.query(query, function(err, res) {
+  connection.query(query, function (err, res) {
     if (err) throw err;
     console.table(res);
     startScreen();
   });
-  // show the result to the user (console.table)
 }
 
 function viewEmployees() {
-  // select from the db
+
   let query = "SELECT * FROM employee";
-  connection.query(query, function(err, res) {
+  connection.query(query, function (err, res) {
     if (err) throw err;
     console.table(res);
     startScreen();
   });
-  // show the result to the user (console.table)
 }
 
 function quit() {
